@@ -15,7 +15,7 @@ The collector does **not** set a country code or change adapter, Wi-Fi, or firew
   378ffaee3b782b9a7f5382c294a846e7c4b3b952717991fd1fd93795c5a85612
   ```
 
-  This hash corresponds to the validated driver build `5.32.908.2026`. If the hardware or driver hash differs, the script stops before sending the private status query.
+  This hash corresponds to the validated driver build `5.32.908.2026`. If the hardware or driver hash differs, the script stops before sending the status query.
 
 ## Run
 
@@ -25,7 +25,6 @@ The collector does **not** set a country code or change adapter, Wi-Fi, or firew
 4. From the repository root, run:
 
    ```powershell
-   Set-Location "."
    .\Collect-SteamFrameAdapterStatus.ps1
    ```
 
@@ -51,7 +50,7 @@ SteamFrame-adapter-status-YYYYMMDD-HHMMSS.txt
 - The country code returned by the adapter driver, including the raw response bytes.
 - The driver's raw `6G Info` status text.
 
-The script does not collect Wi-Fi SSIDs or passwords. The PnP ID and interface GUID identify this adapter; redact them before posting the report publicly if you prefer.
+The script does not collect Wi-Fi SSIDs or passwords. Reports include device-specific identifiers such as the adapter instance ID and interface GUID. Review a report before sharing it; generated reports are ignored by Git by default.
 
 ## Reading the 6 GHz result
 
@@ -76,14 +75,13 @@ Windows API reference: [WlanIhvControl](https://learn.microsoft.com/en-us/window
 
 `Set-SteamFrameAdapterCountryBG.ps1` is a separate experimental script. It sends a one-time vendor-specific request to the Valve adapter driver to set its reported country code to `BG` (Bulgaria). It does not change the Steam Frame's SteamOS regulatory domain, Windows' device setup region, the adapter's registry settings, or the driver files.
 
-The request format is adapted from publicly available source code whose implemented and verified setter is for `US`. The `BG` variant is not validated or supported by Valve or by that source project. Use it only if you understand this limitation and the regulatory requirements where the adapter is being used. The script is restricted to the exact adapter and driver build listed below; it stops if those checks do not match.
+The request format is adapted from publicly available source code whose implemented and verified setter is for `US`. The `BG` variant is not validated or supported by Valve or by that source project. Use it only if you understand this limitation and the regulatory requirements where the adapter is being used. The script is restricted to the Valve adapter hardware ID and exact driver build listed below; it stops if those checks do not match.
 
 ### Preview the request
 
 From the repository root, run this first. Preview mode prints the request fields and bytes but does not contact the driver or change adapter state:
 
 ```powershell
-Set-Location "."
 .\Set-SteamFrameAdapterCountryBG.ps1
 ```
 
@@ -92,7 +90,6 @@ Set-Location "."
 Only if you intend to run the experimental request, open **Windows PowerShell** with **Run as administrator**, then run:
 
 ```powershell
-Set-Location "."
 .\Set-SteamFrameAdapterCountryBG.ps1 -Apply
 ```
 
@@ -111,6 +108,6 @@ An elevated session is required for `-Apply`. Preview mode does not require elev
 
 `Verification: BG acknowledged; driver reports BG and 6 GHz support.` means the driver acknowledged the request and its immediate follow-up queries returned BG and 6 GHz support. It does not prove that the headset will pair or stream, and it does not establish that the setting survives a PC reboot, adapter reconnect, or driver restart. Run `Collect-SteamFrameAdapterStatus.ps1` after a reboot and **before** applying again to capture whether the state persisted.
 
-Initial user-reported test on 2026-10-12: the BG request completed successfully and the Steam Frame connected afterward. Repeatability and persistence across reboot have not yet been confirmed.
+A reported one-time test completed successfully and the Steam Frame connected afterward. Repeatability and persistence across reboot have not been established.
 
 The script does not patch or replace the `.sys`/INF files, change registry values, create a startup task, or configure a rollback. It changes the adapter driver's reported country state through a vendor-specific control request; the persistence behavior is not established. Do not run it repeatedly to force a result. If verification fails, follow the script's message and collect a fresh read-only status report before another attempt.
