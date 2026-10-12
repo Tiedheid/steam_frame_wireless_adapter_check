@@ -29,7 +29,7 @@ $driverFile = Join-Path $env:windir 'System32\drivers\rtwlanuval.sys'
 $reportPath = Join-Path $PSScriptRoot ("SteamFrame-adapter-status-{0}.txt" -f (Get-Date -Format 'yyyyMMdd-HHmmss'))
 $lines = New-Object 'System.Collections.Generic.List[string]'
 
-$lines.Add('Steam Frame Wireless Adapter — Windows read-only status report')
+$lines.Add('Steam Frame Wireless Adapter - Windows read-only status report')
 $lines.Add(('Collected: {0:yyyy-MM-dd HH:mm:ss zzz}' -f (Get-Date)))
 $lines.Add('')
 
